@@ -1,0 +1,38 @@
+/* This file is for your main application css. */
+@import "bootstrap";
+// .side { padding: 4ex; text-align: center; }
+#gameBoard {
+  width: 50%;
+  margin: auto;
+}
+
+.col-3 {
+  padding: 0.25em;
+  background-color: lightgray;
+}
+
+.col-3 p {
+  margin: auto;
+  height: 50px;
+  width: 50px;
+  background-color: orange;
+  text-align: center;
+  font-weight: bold;
+  font-family: serif;
+}
+
+.col-3 p:hover {
+  cursor: pointer;
+}
+
+p.matched {
+  background-color: red;
+}
+
+p.matched:hover {
+  cursor: auto;
+}
+
+h1 {
+  text-align: center;
+}
