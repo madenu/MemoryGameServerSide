@@ -3,6 +3,7 @@ defmodule MemoryWeb.UserSocket do
 
   ## Channels
   # channel "room:*", MemoryWeb.RoomChannel
+  channel "game:*", MemoryWeb.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
