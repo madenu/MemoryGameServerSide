@@ -91,21 +91,21 @@ iex> receive do
     3. Add a new template for the action
 
 ## Websockets with Phoenix and Elixir
-    * See https://hexdocs.pm/phoenix/channels.html
-    * Create a channel in **lib/your_app_web/channels/user_socket.ex**
-    * Create a new module in **lib/your_app_web/channels/channel_name_channel.ex**
-        * Implement `join/3` in your new channel module
-    * Update **assets/js/socket.js**
-    * Import **socket.js** in **assets/js/app.js**
-    * Check the console in the browser for "Joined successfully"
-    * Now in **socket.js** or another JS file
-        * Connect to the socket `socket.connect()`
-        * Pick a channel `let channel = socket.channel("topic:sub", {})`
-        * Add event listeners in the DOM for front-to-back messages
-            * `.addEventListener(...)`
-        * Add event listeners on the channel for back-to-front
-            * `channel.on(...)`
-    * Implement `handle_in/3` in your channel's module
-    * `assign(socket, ...)` is also useful
+* See https://hexdocs.pm/phoenix/channels.html
+* Create a channel in **lib/your_app_web/channels/user_socket.ex**
+* Create a new module in **lib/your_app_web/channels/channel_name_channel.ex**
+    * Implement `join/3` in your new channel module
+* Update **assets/js/socket.js**
+* Import **socket.js** in **assets/js/app.js**
+* Check the console in the browser for "Joined successfully"
+* Now in **socket.js** or another JS file
+    * Connect to the socket `socket.connect()`
+    * Pick a channel `let channel = socket.channel("topic:sub", {})`
+    * Add event listeners in the DOM for front-to-back messages
+        * `.addEventListener(...)`
+    * Add event listeners on the channel for back-to-front
+        * `channel.on(...)`
+* Implement `handle_in/3` in your channel's module
+* `assign(socket, ...)` is also useful
 
 [Mastering Markdown](https://guides.github.com/features/mastering-markdown/)
