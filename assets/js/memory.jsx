@@ -15,7 +15,8 @@ class GameController extends React.Component {
           itemProps[i] =
           {id: i,
           isEnabled: true,
-          isHidden: true,
+          // isHidden: true, TODO
+          isHidden: false,
           isMatched: false,
           value: "",
           onClickHandler: this.onClickHandler.bind(this)
@@ -48,6 +49,8 @@ class GameController extends React.Component {
   reset() {
     // TODO (may not be needed)
     console.log("clicked reset")
+    this.channel.push("game_reset")
+      .receive("ok", this.updateView.bind(this))
   }
 
   render() {
