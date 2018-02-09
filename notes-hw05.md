@@ -8,8 +8,11 @@ Go through lecture notes from 2018-02-01. Make sense of what's going on and get 
     * ~~Create a new project and do the walkthrough~~
     * ~~Get the Hangman example from class working~~
     * ~~Render a simple square and change color on click (server-side)~~
-* Move the memory game logic server-side
-* Look at GenServer and Agent from the Elixir stdlib
+* TODO item click logic
+* TODO review assignment instructions and persistent state
+    * Look at GenServer and Agent from the Elixir stdlib
+* TODO user token authorization
+
 * Get the channel token authentication working
 
 ```

@@ -1,4 +1,7 @@
 defmodule Memory.Game do
+  # TODO is there a better way to update?
+  use MemoryWeb, :channel
+
   def new() do
     %{
       clickCount: 0,
@@ -9,7 +12,64 @@ defmodule Memory.Game do
     }
   end
 
-  def handleItemClick(payload) do
+  def handleItemClick(itemProps, gameState, socket) do
+    # TODO set a timer to broadcast the game enabled state after a delay
+    prevProps = gameState["prevItemProps"]
+    clickCount = gameState["clickCount"]
+    itemProps = Map.put(itemProps, "isHidden", false)
+    gameState = Map.put(gameState, "clickCount", clickCount + 1)
+    gameState = updateItem(itemProps, gameState)
+    broadcast!(socket, "update", gameState)
+
+    if gameState["isSecondClick"] do
+      IO.inspect(itemProps["value"])
+      IO.inspect(prevProps["value"])
+
+      gameState =
+        if itemProps["value"] == prevProps["value"] do
+          itemProps = Map.put(itemProps, "isMatched", true)
+          prevProps = Map.put(prevProps, "isMatched", true)
+          gameState = updateItem(itemProps, gameState)
+          gameState = updateItem(prevProps, gameState)
+          broadcast!(socket, "update", gameState)
+          gameState
+        else
+          gameState = Map.put(gameState, "isEnabled", false)
+          broadcast!(socket, "update", gameState)
+          Process.send_after(self(), :enable, 2000)
+          gameState
+        end
+    end
+
+    gameState = Map.put(gameState, "prevProps", itemProps)
+    gameState = Map.put(gameState, "isSecondClick", !gameState["isSecondClick"])
+    broadcast!(socket, "update", gameState)
+    gameState
+  end
+
+  def handle_info(:enable, state) do
+    {:noreply, state}
+  end
+
+  # update the isEnabled flag for each item
+  def updateEnabled(gameState) do
+    IO.puts("UPDATE ENABLED ...")
+    propsMap = gameState["itemPropsMap"]
+    updatedProps = %{}
+
+    Enum.each(propsMap, fn {id, prop} ->
+      prop = Map.put(prop, "isEnabled", gameState["isEnabled"])
+      updatedProps = Map.put(updatedProps, id, prop)
+    end)
+
+    Map.put(gameState, "itemPropsMap", updatedProps)
+  end
+
+  # updates an item and returns a new game state
+  def updateItem(itemProps, gameState) do
+    propsMap = gameState["itemPropsMap"]
+    propsMap = Map.put(propsMap, itemProps["id"], itemProps)
+    Map.put(gameState, "itemPropsMap", propsMap)
   end
 
   def handleGameReset() do
@@ -34,8 +94,7 @@ defmodule Memory.Game do
         Map.put_new(acc, "#{countdown}", %{
           id: countdown,
           isEnabled: true,
-          # isHidden: true, TODO
-          isHidden: false,
+          isHidden: true,
           isMatched: false,
           value: val
         })

@@ -15,8 +15,7 @@ class GameController extends React.Component {
           itemProps[i] =
           {id: i,
           isEnabled: true,
-          // isHidden: true, TODO
-          isHidden: false,
+          isHidden: true,
           isMatched: false,
           value: "",
           onClickHandler: this.onClickHandler.bind(this)
@@ -31,7 +30,11 @@ class GameController extends React.Component {
     }
     this.channel.join().receive("ok", this.updateView.bind(this)).receive("error", resp => {
       console.log("Unable to join", resp)
-    });
+    })
+    this.channel.on("update", this.updateView.bind(this))
+
+    // TODO this does not seem like the right way to re-enable
+    this.channel.on("enable", this.enable.bind(this))
   }
 
   updateView(state) {
@@ -41,20 +44,24 @@ class GameController extends React.Component {
     this.setState(state)
   }
 
+  enable() {
+    console.log("enable")
+    this.channel.push("enable", this.state)
+      .receive("ok", this.updateView.bind(this))
+  }
+
   onClickHandler(props) {
-    // TODO
-    console.log("clicked an item")
+    this.channel.push("item_clicked", {itemProps: props, gameState: this.state})
+      .receive("ok", this.updateView.bind(this))
   }
 
   reset() {
-    // TODO (may not be needed)
-    console.log("clicked reset")
     this.channel.push("game_reset")
       .receive("ok", this.updateView.bind(this))
   }
 
   render() {
-    console.log("render", this.state)
+    console.log(this.state.itemPropsMap)
     let reset = this.reset.bind(this);
     let itemPropsMap = this.state.itemPropsMap;
     return (<span>

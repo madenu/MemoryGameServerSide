@@ -41254,8 +41254,7 @@ var GameController = function (_React$Component) {
     for (var i = 0; i < 16; i++) {
       itemProps[i] = { id: i,
         isEnabled: true,
-        // isHidden: true, TODO
-        isHidden: false,
+        isHidden: true,
         isMatched: false,
         value: "",
         onClickHandler: _this.onClickHandler.bind(_this)
@@ -41271,6 +41270,10 @@ var GameController = function (_React$Component) {
     _this.channel.join().receive("ok", _this.updateView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
+    _this.channel.on("update", _this.updateView.bind(_this));
+
+    // TODO this does not seem like the right way to re-enable
+    _this.channel.on("enable", _this.enable.bind(_this));
     return _this;
   }
 
@@ -41283,22 +41286,25 @@ var GameController = function (_React$Component) {
       this.setState(state);
     }
   }, {
+    key: 'enable',
+    value: function enable() {
+      console.log("enable");
+      this.channel.push("enable", this.state).receive("ok", this.updateView.bind(this));
+    }
+  }, {
     key: 'onClickHandler',
     value: function onClickHandler(props) {
-      // TODO
-      console.log("clicked an item");
+      this.channel.push("item_clicked", { itemProps: props, gameState: this.state }).receive("ok", this.updateView.bind(this));
     }
   }, {
     key: 'reset',
     value: function reset() {
-      // TODO (may not be needed)
-      console.log("clicked reset");
       this.channel.push("game_reset").receive("ok", this.updateView.bind(this));
     }
   }, {
     key: 'render',
     value: function render() {
-      console.log("render", this.state);
+      console.log(this.state.itemPropsMap);
       var reset = this.reset.bind(this);
       var itemPropsMap = this.state.itemPropsMap;
       return _react2.default.createElement(
