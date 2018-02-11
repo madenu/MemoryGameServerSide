@@ -35,6 +35,8 @@ class GameController extends React.Component {
   }
 
   updateView(state) {
+    console.log("updateView")
+    console.log(state)
     for(var key in state.itemPropsMap) {
       state.itemPropsMap[key]["onClickHandler"] = this.onClickHandler.bind(this)
     }
@@ -48,6 +50,8 @@ class GameController extends React.Component {
   }
 
   onClickHandler(props) {
+    console.log("onClickHandler")
+    console.log(this.state)
     this.channel.push("item_clicked", {itemProps: props, gameState: this.state})
       .receive("ok", this.updateView.bind(this))
   }
@@ -58,7 +62,7 @@ class GameController extends React.Component {
   }
 
   render() {
-    console.log(this.state.itemPropsMap)
+    // console.log(this.state)
     let reset = this.reset.bind(this);
     let itemPropsMap = this.state.itemPropsMap;
     return (<span>

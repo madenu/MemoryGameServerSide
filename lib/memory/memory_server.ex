@@ -11,17 +11,14 @@ defmodule Memory.Server do
   end
 
   def handle_info({:hide_guess, socket, gameName, %{gameState: gS, itemProps: iP}}, state) do
-    IO.puts("HANDLE INFO ...")
     pP = gS["prevItemProps"]
-    pP = Map.put(iP, "isHidden", true)
+    pP = Map.put(pP, "isHidden", true)
     iP = Map.put(iP, "isHidden", true)
     gS = Game.updateItem(pP, gS)
     gS = Game.updateItem(iP, gS)
     gS = Map.put(gS, "isEnabled", true)
     gS = Game.updateEnabled(gS)
-    IO.inspect(gS)
     MemoryAgent.save(gameName, %{gameState: gS, itemProps: iP})
-    IO.inspect(gS)
     broadcast!(socket, "update", gS)
     {:noreply, state}
   end

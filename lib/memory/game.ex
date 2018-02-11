@@ -18,40 +18,29 @@ defmodule Memory.Game do
     itemProps = Map.put(itemProps, "isHidden", false)
     gameState = Map.put(gameState, "clickCount", clickCount + 1)
     gameState = updateItem(itemProps, gameState)
+    # TODO game name
     MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
-    broadcast!(socket, "update", gameState)
-    # TODO TODO TODO
-    # MemoryAgent.load("foo") |> IO.inspect()
 
     if gameState["isSecondClick"] do
-      # IO.inspect(itemProps["value"])
-      # IO.inspect(prevProps["value"])
+      IO.inspect(gameState)
 
-      gameState =
-        if itemProps["value"] == prevProps["value"] do
-          itemProps = Map.put(itemProps, "isMatched", true)
-          prevProps = Map.put(prevProps, "isMatched", true)
-          gameState = updateItem(itemProps, gameState)
-          gameState = updateItem(prevProps, gameState)
-          MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
-          broadcast!(socket, "update", gameState)
-          # TODO TODO TODO
-          # MemoryAgent.load("foo") |> IO.inspect()
-          gameState
-        else
-          gameState = Map.put(gameState, "isEnabled", false)
-          # TODO TODO TODO
-          MemoryAgent.schedule_work(%{name: "foo", socket: socket})
-          gameState
-        end
+      if itemProps["value"] == prevProps["value"] do
+        itemProps = Map.put(itemProps, "isMatched", true)
+        prevProps = Map.put(prevProps, "isMatched", true)
+        gameState = updateItem(itemProps, gameState)
+        gameState = updateItem(prevProps, gameState)
+        MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
+      else
+        gameState = Map.put(gameState, "isEnabled", false)
+        MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
+        MemoryAgent.schedule_work(%{name: "foo", socket: socket})
+      end
     end
 
-    gameState = Map.put(gameState, "prevProps", itemProps)
+    gameState = Map.put(gameState, "prevItemProps", itemProps)
     gameState = Map.put(gameState, "isSecondClick", !gameState["isSecondClick"])
     MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
-    broadcast!(socket, "update", gameState)
     # TODO TODO TODO
-    # MemoryAgent.load("foo") |> IO.inspect()
     gameState
   end
 

@@ -41277,6 +41277,8 @@ var GameController = function (_React$Component) {
   _createClass(GameController, [{
     key: 'updateView',
     value: function updateView(state) {
+      console.log("updateView");
+      console.log(state);
       for (var key in state.itemPropsMap) {
         state.itemPropsMap[key]["onClickHandler"] = this.onClickHandler.bind(this);
       }
@@ -41291,6 +41293,8 @@ var GameController = function (_React$Component) {
   }, {
     key: 'onClickHandler',
     value: function onClickHandler(props) {
+      console.log("onClickHandler");
+      console.log(this.state);
       this.channel.push("item_clicked", { itemProps: props, gameState: this.state }).receive("ok", this.updateView.bind(this));
     }
   }, {
@@ -41301,7 +41305,7 @@ var GameController = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      console.log(this.state.itemPropsMap);
+      // console.log(this.state)
       var reset = this.reset.bind(this);
       var itemPropsMap = this.state.itemPropsMap;
       return _react2.default.createElement(
