@@ -5,7 +5,6 @@ defmodule Memory.Server do
   alias Memory.MemoryAgent
 
   def start_link() do
-    IO.puts("START LINK ...")
     IO.puts(__MODULE__)
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
@@ -18,6 +17,7 @@ defmodule Memory.Server do
     gS = Game.updateItem(iP, gS)
     gS = Map.put(gS, "isEnabled", true)
     gS = Game.updateEnabled(gS)
+    gS = Map.put(gS, "isSecondClick", false)
     MemoryAgent.save(gameName, %{gameState: gS, itemProps: iP})
     broadcast!(socket, "update", gS)
     {:noreply, state}

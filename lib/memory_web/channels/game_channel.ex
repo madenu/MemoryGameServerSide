@@ -9,8 +9,6 @@ defmodule MemoryWeb.GameChannel do
 
   def handle_in("item_clicked", %{"itemProps" => itemProps, "gameState" => gameState}, socket) do
     state = Game.handleItemClick(itemProps, gameState, socket)
-    IO.puts("handle_in")
-    IO.inspect(state)
     {:reply, {:ok, state}, socket}
   end
 

@@ -15,53 +15,52 @@ defmodule Memory.Game do
   def handleItemClick(itemProps, gameState, socket) do
     prevProps = gameState["prevItemProps"]
     clickCount = gameState["clickCount"]
-    itemProps = Map.put(itemProps, "isHidden", false)
-    gameState = Map.put(gameState, "clickCount", clickCount + 1)
-    gameState = updateItem(itemProps, gameState)
+    newProps = Map.put(itemProps, "isHidden", false)
+    newState = Map.put(gameState, "clickCount", clickCount + 1)
+    newState = updateItem(newProps, newState)
     # TODO game name
-    MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
+    MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
 
-    if gameState["isSecondClick"] do
-      IO.inspect(gameState)
-
-      if itemProps["value"] == prevProps["value"] do
-        itemProps = Map.put(itemProps, "isMatched", true)
+    if newState["isSecondClick"] do
+      if newProps["value"] == prevProps["value"] do
+        newProps = Map.put(newProps, "isMatched", true)
         prevProps = Map.put(prevProps, "isMatched", true)
-        gameState = updateItem(itemProps, gameState)
-        gameState = updateItem(prevProps, gameState)
-        MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
+        newState = updateItem(newProps, newState)
+        newState = updateItem(prevProps, newState)
+        MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
+        newState
       else
-        gameState = Map.put(gameState, "isEnabled", false)
-        MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
+        newState = Map.put(newState, "isEnabled", false)
+        IO.puts("!!!!!!!!!!")
+        IO.inspect(newState["isEnabled"])
+        newState = updateEnabled(newState)
+        MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
         MemoryAgent.schedule_work(%{name: "foo", socket: socket})
+        newState
       end
+    else
+      newState = Map.put(newState, "prevItemProps", newProps)
+      newState = Map.put(newState, "isSecondClick", !newState["isSecondClick"])
+      MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
+      newState
     end
-
-    gameState = Map.put(gameState, "prevItemProps", itemProps)
-    gameState = Map.put(gameState, "isSecondClick", !gameState["isSecondClick"])
-    MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
-    # TODO TODO TODO
-    gameState
   end
 
   # update the isEnabled flag for each item
   def updateEnabled(gameState) do
-    IO.puts("UPDATE ENABLED ...")
     propsMap = gameState["itemPropsMap"]
     updatedProps = helpUpdateEnabled(15, propsMap, gameState["isEnabled"])
-    ("UPDATE ENABLED ..." <> Kernel.inspect(updatedProps)) |> IO.inspect()
     Map.put(gameState, "itemPropsMap", updatedProps)
   end
 
-  # recurs through all of the item IDs,
+  # recurs through all of the item IDs, disabling or enabling them according to the flag
   defp helpUpdateEnabled(id, propsMap, flag) do
     if id < 0 do
       propsMap
+      IO.inspect(propsMap)
     else
-      props = propsMap["#{id}"]
-      props = Map.put(props, "isEnabled", flag)
-      propsMap = Map.put(propsMap, "id", props)
-      helpUpdateEnabled(id - 1, propsMap, flag)
+      updated = Map.put(propsMap, "#{id}", Map.put(propsMap["#{id}"], "isEnabled", flag))
+      helpUpdateEnabled(id - 1, updated, flag)
     end
   end
 

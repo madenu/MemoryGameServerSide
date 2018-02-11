@@ -41294,7 +41294,7 @@ var GameController = function (_React$Component) {
     key: 'onClickHandler',
     value: function onClickHandler(props) {
       console.log("onClickHandler");
-      console.log(this.state);
+      // console.log(this.state)
       this.channel.push("item_clicked", { itemProps: props, gameState: this.state }).receive("ok", this.updateView.bind(this));
     }
   }, {
