@@ -1,20 +1,18 @@
 defmodule Memory.Game do
-  # TODO is there a better way to update?
   use MemoryWeb, :channel
   alias Memory.MemoryAgent
 
   def new() do
     %{
-      clickCount: 0,
-      isSecondClick: false,
-      prevItemProps: nil,
-      isEnabled: true,
-      itemPropsMap: newPropsMap()
+      "clickCount" => 0,
+      "isSecondClick" => false,
+      "prevItemProps" => nil,
+      "isEnabled" => true,
+      "itemPropsMap" => newPropsMap()
     }
   end
 
   def handleItemClick(itemProps, gameState, socket) do
-    # TODO set a timer to broadcast the game enabled state after a delay
     prevProps = gameState["prevItemProps"]
     clickCount = gameState["clickCount"]
     itemProps = Map.put(itemProps, "isHidden", false)
@@ -23,11 +21,11 @@ defmodule Memory.Game do
     MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
     broadcast!(socket, "update", gameState)
     # TODO TODO TODO
-    MemoryAgent.load("foo") |> IO.inspect()
+    # MemoryAgent.load("foo") |> IO.inspect()
 
     if gameState["isSecondClick"] do
-      IO.inspect(itemProps["value"])
-      IO.inspect(prevProps["value"])
+      # IO.inspect(itemProps["value"])
+      # IO.inspect(prevProps["value"])
 
       gameState =
         if itemProps["value"] == prevProps["value"] do
@@ -38,14 +36,12 @@ defmodule Memory.Game do
           MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
           broadcast!(socket, "update", gameState)
           # TODO TODO TODO
-          MemoryAgent.load("foo") |> IO.inspect()
+          # MemoryAgent.load("foo") |> IO.inspect()
           gameState
         else
           gameState = Map.put(gameState, "isEnabled", false)
-          MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
-          broadcast!(socket, "update", gameState)
           # TODO TODO TODO
-          MemoryAgent.load("foo") |> IO.inspect()
+          MemoryAgent.schedule_work(%{name: "foo", socket: socket})
           gameState
         end
     end
@@ -55,7 +51,7 @@ defmodule Memory.Game do
     MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
     broadcast!(socket, "update", gameState)
     # TODO TODO TODO
-    MemoryAgent.load("foo") |> IO.inspect()
+    # MemoryAgent.load("foo") |> IO.inspect()
     gameState
   end
 
@@ -63,14 +59,21 @@ defmodule Memory.Game do
   def updateEnabled(gameState) do
     IO.puts("UPDATE ENABLED ...")
     propsMap = gameState["itemPropsMap"]
-    updatedProps = %{}
-
-    Enum.each(propsMap, fn {id, prop} ->
-      prop = Map.put(prop, "isEnabled", gameState["isEnabled"])
-      updatedProps = Map.put(updatedProps, id, prop)
-    end)
-
+    updatedProps = helpUpdateEnabled(15, propsMap, gameState["isEnabled"])
+    ("UPDATE ENABLED ..." <> Kernel.inspect(updatedProps)) |> IO.inspect()
     Map.put(gameState, "itemPropsMap", updatedProps)
+  end
+
+  # recurs through all of the item IDs,
+  defp helpUpdateEnabled(id, propsMap, flag) do
+    if id < 0 do
+      propsMap
+    else
+      props = propsMap["#{id}"]
+      props = Map.put(props, "isEnabled", flag)
+      propsMap = Map.put(propsMap, "id", props)
+      helpUpdateEnabled(id - 1, propsMap, flag)
+    end
   end
 
   # updates an item and returns a new game state
@@ -100,11 +103,11 @@ defmodule Memory.Game do
 
       acc =
         Map.put_new(acc, "#{countdown}", %{
-          id: countdown,
-          isEnabled: true,
-          isHidden: true,
-          isMatched: false,
-          value: val
+          "id" => countdown,
+          "isEnabled" => true,
+          "isHidden" => true,
+          "isMatched" => false,
+          "value" => val
         })
 
       newPropsMap(letters, countdown - 1, acc)

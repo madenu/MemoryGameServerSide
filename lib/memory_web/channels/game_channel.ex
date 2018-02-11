@@ -3,7 +3,7 @@ defmodule MemoryWeb.GameChannel do
   alias Memory.Game
 
   def join("game:", _payload, socket) do
-    # TODO load the saved agent state based on subtopic
+    # TODO load the saved agent state 
     {:ok, Game.new(), socket}
   end
 
