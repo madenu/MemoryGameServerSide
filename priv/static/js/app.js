@@ -41271,9 +41271,6 @@ var GameController = function (_React$Component) {
       console.log("Unable to join", resp);
     });
     _this.channel.on("update", _this.updateView.bind(_this));
-
-    // TODO this does not seem like the right way to re-enable
-    _this.channel.on("enable", _this.enable.bind(_this));
     return _this;
   }
 

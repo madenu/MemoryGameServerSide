@@ -32,9 +32,6 @@ class GameController extends React.Component {
       console.log("Unable to join", resp)
     })
     this.channel.on("update", this.updateView.bind(this))
-
-    // TODO this does not seem like the right way to re-enable
-    this.channel.on("enable", this.enable.bind(this))
   }
 
   updateView(state) {

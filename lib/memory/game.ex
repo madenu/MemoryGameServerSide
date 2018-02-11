@@ -1,6 +1,7 @@
 defmodule Memory.Game do
   # TODO is there a better way to update?
   use MemoryWeb, :channel
+  alias Memory.MemoryAgent
 
   def new() do
     %{
@@ -19,7 +20,10 @@ defmodule Memory.Game do
     itemProps = Map.put(itemProps, "isHidden", false)
     gameState = Map.put(gameState, "clickCount", clickCount + 1)
     gameState = updateItem(itemProps, gameState)
+    MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
     broadcast!(socket, "update", gameState)
+    # TODO TODO TODO
+    MemoryAgent.load("foo") |> IO.inspect()
 
     if gameState["isSecondClick"] do
       IO.inspect(itemProps["value"])
@@ -31,24 +35,28 @@ defmodule Memory.Game do
           prevProps = Map.put(prevProps, "isMatched", true)
           gameState = updateItem(itemProps, gameState)
           gameState = updateItem(prevProps, gameState)
+          MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
           broadcast!(socket, "update", gameState)
+          # TODO TODO TODO
+          MemoryAgent.load("foo") |> IO.inspect()
           gameState
         else
           gameState = Map.put(gameState, "isEnabled", false)
+          MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
           broadcast!(socket, "update", gameState)
-          Process.send_after(self(), :enable, 2000)
+          # TODO TODO TODO
+          MemoryAgent.load("foo") |> IO.inspect()
           gameState
         end
     end
 
     gameState = Map.put(gameState, "prevProps", itemProps)
     gameState = Map.put(gameState, "isSecondClick", !gameState["isSecondClick"])
+    MemoryAgent.save("foo", %{gameState: gameState, itemProps: itemProps})
     broadcast!(socket, "update", gameState)
+    # TODO TODO TODO
+    MemoryAgent.load("foo") |> IO.inspect()
     gameState
-  end
-
-  def handle_info(:enable, state) do
-    {:noreply, state}
   end
 
   # update the isEnabled flag for each item
