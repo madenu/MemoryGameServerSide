@@ -31,7 +31,7 @@ class GameController extends React.Component {
     this.channel.join().receive("ok", this.updateView.bind(this)).receive("error", resp => {
       console.log("Unable to join", resp)
     })
-    this.channel.on("update", this.updateView.bind(this))
+    this.channel.on("update:" + window.gameName, this.updateView.bind(this))
   }
 
   updateView(state) {
@@ -43,21 +43,15 @@ class GameController extends React.Component {
     this.setState(state)
   }
 
-  enable() {
-    console.log("enable")
-    this.channel.push("enable", this.state)
-      .receive("ok", this.updateView.bind(this))
-  }
-
   onClickHandler(props) {
     console.log("onClickHandler")
     // console.log(this.state)
-    this.channel.push("item_clicked", {itemProps: props, gameState: this.state})
+    this.channel.push("item_clicked:" + window.gameName, {itemProps: props, gameState: this.state})
       .receive("ok", this.updateView.bind(this))
   }
 
   reset() {
-    this.channel.push("game_reset")
+    this.channel.push("game_reset:" + window.gameName)
       .receive("ok", this.updateView.bind(this))
   }
 

@@ -2,6 +2,18 @@ defmodule Memory.Game do
   use MemoryWeb, :channel
   alias Memory.MemoryAgent
 
+  def rejoin(gameName) do
+    gS =
+      if MemoryAgent.load(gameName) do
+        %{gameState: temp, itemProps: _iP} = MemoryAgent.load(gameName)
+        temp
+      else
+        temp = new()
+        MemoryAgent.save(gameName, %{gameState: temp, itemProps: nil})
+        temp
+      end
+  end
+
   def new() do
     %{
       "clickCount" => 0,
@@ -12,36 +24,34 @@ defmodule Memory.Game do
     }
   end
 
-  def handleItemClick(itemProps, gameState, socket) do
+  def handleItemClick(gameName, itemProps, gameState, socket) do
     prevProps = gameState["prevItemProps"]
     clickCount = gameState["clickCount"]
     newProps = Map.put(itemProps, "isHidden", false)
     newState = Map.put(gameState, "clickCount", clickCount + 1)
     newState = updateItem(newProps, newState)
-    # TODO game name
-    MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
+    MemoryAgent.save(gameName, %{gameState: newState, itemProps: newProps})
 
     if newState["isSecondClick"] do
       if newProps["value"] == prevProps["value"] do
         newProps = Map.put(newProps, "isMatched", true)
         prevProps = Map.put(prevProps, "isMatched", true)
+        newState = Map.put(newState, "isSecondClick", !newState["isSecondClick"])
         newState = updateItem(newProps, newState)
         newState = updateItem(prevProps, newState)
-        MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
+        MemoryAgent.save(gameName, %{gameState: newState, itemProps: newProps})
         newState
       else
         newState = Map.put(newState, "isEnabled", false)
-        IO.puts("!!!!!!!!!!")
-        IO.inspect(newState["isEnabled"])
         newState = updateEnabled(newState)
-        MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
-        MemoryAgent.schedule_work(%{name: "foo", socket: socket})
+        MemoryAgent.save(gameName, %{gameState: newState, itemProps: newProps})
+        MemoryAgent.schedule_work(%{name: gameName, socket: socket})
         newState
       end
     else
       newState = Map.put(newState, "prevItemProps", newProps)
       newState = Map.put(newState, "isSecondClick", !newState["isSecondClick"])
-      MemoryAgent.save("foo", %{gameState: newState, itemProps: newProps})
+      MemoryAgent.save(gameName, %{gameState: newState, itemProps: newProps})
       newState
     end
   end
@@ -71,8 +81,10 @@ defmodule Memory.Game do
     Map.put(gameState, "itemPropsMap", propsMap)
   end
 
-  def handleGameReset() do
-    new()
+  def handleGameReset(gameName) do
+    MemoryAgent.save(gameName, %{gameState: new(), itemProps: nil})
+    %{gameState: gS, itemProps: _iP} = MemoryAgent.load(gameName)
+    gS
   end
 
   defp newPropsMap() do

@@ -1,6 +1,5 @@
 defmodule Memory.MemoryAgent do
   use Agent
-  alias Memory.Game
 
   def start_link() do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
@@ -24,7 +23,7 @@ defmodule Memory.MemoryAgent do
     Process.send_after(
       Elixir.Memory.Server,
       {:hide_guess, socket, gameName, load(gameName)},
-      2000
+      1000
     )
   end
 end

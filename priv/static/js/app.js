@@ -41185,7 +41185,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // paths "./socket" or full ones "web/static/js/socket".
 
 function init() {
-  var channel = _socket2.default.channel("game:", {});
+  var channel = _socket2.default.channel("game:" + window.gameName, {});
   var root = document.getElementById('game');
   (0, _memory2.default)(root, channel);
 }
@@ -41270,7 +41270,7 @@ var GameController = function (_React$Component) {
     _this.channel.join().receive("ok", _this.updateView.bind(_this)).receive("error", function (resp) {
       console.log("Unable to join", resp);
     });
-    _this.channel.on("update", _this.updateView.bind(_this));
+    _this.channel.on("update:" + window.gameName, _this.updateView.bind(_this));
     return _this;
   }
 
@@ -41285,22 +41285,16 @@ var GameController = function (_React$Component) {
       this.setState(state);
     }
   }, {
-    key: 'enable',
-    value: function enable() {
-      console.log("enable");
-      this.channel.push("enable", this.state).receive("ok", this.updateView.bind(this));
-    }
-  }, {
     key: 'onClickHandler',
     value: function onClickHandler(props) {
       console.log("onClickHandler");
       // console.log(this.state)
-      this.channel.push("item_clicked", { itemProps: props, gameState: this.state }).receive("ok", this.updateView.bind(this));
+      this.channel.push("item_clicked:" + window.gameName, { itemProps: props, gameState: this.state }).receive("ok", this.updateView.bind(this));
     }
   }, {
     key: 'reset',
     value: function reset() {
-      this.channel.push("game_reset").receive("ok", this.updateView.bind(this));
+      this.channel.push("game_reset:" + window.gameName).receive("ok", this.updateView.bind(this));
     }
   }, {
     key: 'render',

@@ -1,8 +1,7 @@
-<h1>Memory Game</h1>
-
-<div id="game">
-  Loading...
+<div id="index-page">
+  <form action="/game" method="get">
+    <p>(Re)Join a game.</p>
+    <input type="text" name="gameName"/><br/>
+    <input type="submit"/><br/>
+  </form>
 </div>
-
-
-

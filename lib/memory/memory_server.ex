@@ -19,7 +19,7 @@ defmodule Memory.Server do
     gS = Game.updateEnabled(gS)
     gS = Map.put(gS, "isSecondClick", false)
     MemoryAgent.save(gameName, %{gameState: gS, itemProps: iP})
-    broadcast!(socket, "update", gS)
+    broadcast!(socket, "update:" <> gameName, gS)
     {:noreply, state}
   end
 end

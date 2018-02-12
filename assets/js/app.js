@@ -21,7 +21,7 @@ import "phoenix_html";
 import socket from "./socket"
 import run_memory from "./memory";
 function init() {
-  let channel = socket.channel("game:", {})
+  let channel = socket.channel("game:" + window.gameName, {})
   let root = document.getElementById('game');
   run_memory(root, channel);
 }
